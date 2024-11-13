@@ -22,6 +22,15 @@ public class PrivateCardsConverter {
             "A2o", "K2o", "Q2o", "J2o", "T2o", "92o", "82o", "72o", "62o", "52o", "42o", "32o", "22"
     };
 
+    public static Double[] zeroWeights = new Double[allPrivateCardsSummary.length];
+    static {
+        Arrays.fill(zeroWeights, 0.0);
+    }
+
+    public static String[] getAllPrivateCardsSummary() {
+        return Arrays.copyOf(allPrivateCardsSummary, allPrivateCardsSummary.length);
+    }
+
     public static Double[] rangeStr2Weights(String rangeStr) {
         List<String> rangeList = Arrays.asList(rangeStr.split(","));
         Map<String, Double> rangeWeightMap = new HashMap<>(allPrivateCardsSummary.length);

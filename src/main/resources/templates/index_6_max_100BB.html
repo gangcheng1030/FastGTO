@@ -13,49 +13,47 @@
 <body>
 <div class="container">
     <h3>随机数</h3>
-    <p th:text="${randomNum}"></p>
+    <p th:text="${randomNum}" style="font-size: 20px;"></p>
 </div>
 <div class="container">
     <h3>RFI</h3>
     <div class="area">
-        <a href="/preflop/parentAndPosition?parent=0&position=LJ">LJ</a>
-<!--        <a href="jsp_6_max_100BB/rfi/LJ.jsp">LJ</a>-->
-<!--        <a href="jsp_6_max_100BB/rfi/HJ.jsp">HJ</a>-->
-<!--        <a href="jsp_6_max_100BB/rfi/CO.jsp">CO</a>-->
-<!--        <a href="jsp_6_max_100BB/rfi/BN.jsp">BN</a>-->
-<!--        <a href="jsp_6_max_100BB/rfi/SB.jsp">SB</a>-->
-<!--        <a href="jsp_6_max_100BB/rfi/BB.jsp">BB</a>-->
+        <a th:href="@{/preflop/parentAndPosition}">LJ</a>
+        <a th:href="@{/preflop/parentAndPosition(parent='LJfold')}">HJ</a>
+        <a th:href="@{/preflop/parentAndPosition(parent='LJfold:HJfold')}">CO</a>
+        <a th:href="@{/preflop/parentAndPosition(parent='LJfold:HJfold:COfold')}">BN</a>
+        <a th:href="@{/preflop/parentAndPosition(parent='LJfold:HJfold:COfold:BNfold')}">SB</a>
     </div>
 </div>
 
-<!--<div class="container">-->
-<!--    <h3>DEFENSE</h3>-->
-<!--    <div class="area">-->
-<!--        <a href="jsp_6_max_100BB/defense/HJ_VS_LJ.jsp">HJ_VS_LJ</a>-->
-<!--    </div>-->
-<!--    <div class="area">-->
-<!--        <a href="jsp_6_max_100BB/defense/CO_VS_LJ.jsp">CO_VS_LJ</a>-->
-<!--        <a href="jsp_6_max_100BB/defense/CO_VS_HJ.jsp">CO_VS_HJ</a>-->
-<!--    </div>-->
-<!--    <div class="area">-->
-<!--        <a href="jsp_6_max_100BB/defense/BN_VS_LJ.jsp">BN_VS_LJ</a>-->
-<!--        <a href="jsp_6_max_100BB/defense/BN_VS_HJ.jsp">BN_VS_HJ</a>-->
-<!--        <a href="jsp_6_max_100BB/defense/BN_VS_CO.jsp">BN_VS_CO</a>-->
-<!--    </div>-->
-<!--    <div class="area">-->
-<!--        <a href="jsp_6_max_100BB/defense/SB_VS_LJ.jsp">SB_VS_LJ</a>-->
-<!--        <a href="jsp_6_max_100BB/defense/SB_VS_HJ.jsp">SB_VS_HJ</a>-->
-<!--        <a href="jsp_6_max_100BB/defense/SB_VS_CO.jsp">SB_VS_CO</a>-->
-<!--        <a href="jsp_6_max_100BB/defense/SB_VS_BN.jsp">SB_VS_BN</a>-->
-<!--    </div>-->
-<!--    <div class="area">-->
-<!--        <a href="jsp_6_max_100BB/defense/BB_VS_LJ.jsp">BB_VS_LJ</a>-->
-<!--        <a href="jsp_6_max_100BB/defense/BB_VS_HJ.jsp">BB_VS_HJ</a>-->
-<!--        <a href="jsp_6_max_100BB/defense/BB_VS_CO.jsp">BB_VS_CO</a>-->
-<!--        <a href="jsp_6_max_100BB/defense/BB_VS_BN.jsp">BB_VS_BN</a>-->
-<!--        <a href="jsp_6_max_100BB/defense/BB_VS_SB.jsp">BB_VS_SB</a>-->
-<!--    </div>-->
-<!--</div>-->
+<div class="container">
+    <h3>DEFENSE</h3>
+    <div class="area">
+        <a th:href="@{/preflop/parentAndPosition(parent='LJ2bet')}">HJ_VS_LJ</a>
+    </div>
+    <div class="area">
+        <a th:href="@{/preflop/parentAndPosition(parent='LJ2bet:HJfold')}">CO_VS_LJ</a>
+        <a th:href="@{/preflop/parentAndPosition(parent='LJfold:HJ2bet')}">CO_VS_HJ</a>
+    </div>
+    <div class="area">
+        <a th:href="@{/preflop/parentAndPosition(parent='LJ2bet:HJfold:COfold')}">BN_VS_LJ</a>
+        <a th:href="@{/preflop/parentAndPosition(parent='LJfold:HJ2bet:COfold')}">BN_VS_HJ</a>
+        <a th:href="@{/preflop/parentAndPosition(parent='LJfold:HJfold:CO2bet')}">BN_VS_CO</a>
+    </div>
+    <div class="area">
+        <a th:href="@{/preflop/parentAndPosition(parent='LJ2bet:HJfold:COfold:BNfold')}">SB_VS_LJ</a>
+        <a th:href="@{/preflop/parentAndPosition(parent='LJfold:HJ2bet:COfold:BNfold')}">SB_VS_HJ</a>
+        <a th:href="@{/preflop/parentAndPosition(parent='LJfold:HJfold:CO2bet:BNfold')}">SB_VS_CO</a>
+        <a th:href="@{/preflop/parentAndPosition(parent='LJfold:HJfold:COfold:BN2bet')}">SB_VS_BN</a>
+    </div>
+    <div class="area">
+        <a th:href="@{/preflop/parentAndPosition(parent='LJ2bet:HJfold:COfold:BNfold:SBfold')}">BB_VS_LJ</a>
+        <a th:href="@{/preflop/parentAndPosition(parent='LJfold:HJ2bet:COfold:BNfold:SBfold')}">BB_VS_HJ</a>
+        <a th:href="@{/preflop/parentAndPosition(parent='LJfold:HJfold:CO2bet:BNfold:SBfold')}">BB_VS_CO</a>
+        <a th:href="@{/preflop/parentAndPosition(parent='LJfold:HJfold:COfold:BN2bet:SBfold')}">BB_VS_BN</a>
+        <a th:href="@{/preflop/parentAndPosition(parent='LJfold:HJfold:COfold:BNfold:SB2bet')}">BB_VS_SB</a>
+    </div>
+</div>
 </body>
 </body>
 </html>
