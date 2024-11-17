@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Preflop</title>
     <style>
         .grid-container {
             display: grid;
@@ -38,6 +38,9 @@
     <div th:each="nextAction, iterStat : ${nextActions}" th:with="nextActionNames=${nextActionNames}">
         <a th:href="@{/preflop/parentAndPosition(parent=${nextAction},randomNum=${randomNum})}" th:text="${nextActionNames[__${iterStat.index}__]}" style="font-size: 20px;"></a>
     </div>
+</div>
+<div class="container">
+    <a th:if="${enterFlop}" th:href="@{/postflop/flop(preflopActions=${actions})}" style="font-size: 20px;">进入Flop</a>
 </div>
 </body>
 </html>

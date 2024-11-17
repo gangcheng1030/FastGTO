@@ -6,6 +6,6 @@ public class RandomGenerator {
     private static final Random random = new Random(System.currentTimeMillis());
 
     public static int nextInt(int n) {
-        return random.nextInt(100);
+        return random.nextInt(n);
     }
 }

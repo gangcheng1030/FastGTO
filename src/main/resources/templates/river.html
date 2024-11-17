@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>River</title>
+  <style>
+    .card-container {
+      display: grid;
+      grid-template-columns: repeat(13, 40px);
+      gap: 3px;
+      margin: 5px;
+    }
+
+    .card-button {
+      padding: 10px;
+      border: 1px solid #000;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <a href="/index_6_max_100BB" style="font-size: 20px;">回到首页</a>
+</div>
+
+<div th:if="${needInput}">
+  <div class="card-container" id="riverCardContainer">
+    <!-- 扑克牌按钮将通过JavaScript动态生成 -->
+  </div>
+  <div class="container">
+    <label for="riverCard">river牌面：</label>
+    <input type="text" id="riverCard" name="riverCard" placeholder="点击上方按钮">
+  </div>
+
+  <div id="preflopActions" th:text="${preflopActions}" style="display: none"></div>
+  <div id="flopCards" th:text="${flopCards}" style="display: none"></div>
+  <div id="privateCards" th:text="${privateCards}" style="display: none"></div>
+  <div id="position" th:text="${position}" style="display: none"></div>
+  <div id="postflopActions" th:text="${postflopActions}" style="display: none"></div>
+  <a id="getStrategy" href="#">获取策略</a>
+
+  <script>
+    // 扑克牌的花色和数值
+    const suits = ['♠', '♥', '♣', '♦'];
+    const ranks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
+
+    // 生成扑克牌按钮
+    const riverCardInput = document.getElementById('riverCard');
+    function generateRiverCards() {
+      // 获取容器和输入框元素
+      const cardContainer = document.getElementById('riverCardContainer');
+      cardContainer.innerHTML = ''; // 清空容器
+      for (let suit of suits) {
+        for (let rank of ranks) {
+          const cardButton = document.createElement('button');
+          cardButton.textContent = `${rank}${suit}`;
+          cardButton.className = 'card-button';
+          cardButton.onclick = function () {
+            riverCardInput.value = `${rank}${suit}`; // 更新输入框的值
+          };
+          cardContainer.appendChild(cardButton);
+        }
+      }
+    }
+
+    // 初始化扑克牌
+    generateRiverCards();
+
+    // 设置链接的href属性，使其包含输入框的值作为GET请求的参数
+    const getStrategyLink = document.getElementById('getStrategy');
+    const preflopActions = document.getElementById("preflopActions");
+    const flopCards = document.getElementById("flopCards");
+    const privateCards = document.getElementById("privateCards");
+    const position = document.getElementById("position");
+    const postflopActions = document.getElementById("postflopActions");
+    getStrategyLink.href = `#`;
+    getStrategyLink.onclick = function() {
+      if (!riverCardInput.value.trim()) {
+        alert("river牌面不能为空！");
+        return false;
+      }
+
+      getStrategyLink.href = `/postflop/river?preflopActions=${preflopActions.textContent}&flopCards=${flopCards.textContent}&privateCards=${privateCards.textContent}&position=${position.textContent}&postflopActions=${postflopActions.textContent}&riverCard=${riverCardInput.value}`;
+      return true;
+    };
+  </script>
+</div>
+<div th:unless="${needInput}">
+  <div class="container">
+    <div th:each="entry : ${strategy}">
+      <a th:href="@{/postflop/river(preflopActions=${preflopActions}, flopCards=${flopCards}, privateCards=${privateCards}, position=${position}, postflopActions=${entry.getValue()}, riverCard=${riverCard}, notChance=true)}"
+         th:text="${entry.getKey()}" style="font-size: 20px;"></a>
+    </div>
+  </div>
+
+  <div th:if="${nextStreet}">
+    <p style="font-size: 20px;">结束</p>
+  </div>
+</div>
+</body>
+</html>

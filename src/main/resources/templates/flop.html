@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flop</title>
+    <style>
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(13, 40px);
+            gap: 3px;
+            margin: 5px;
+        }
+
+        .position-container {
+            display: grid;
+            grid-template-columns: repeat(2, 40px);
+            gap: 3px;
+            margin: 5px;
+        }
+
+        .card-button {
+            padding: 10px;
+            border: 1px solid #000;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/index_6_max_100BB" style="font-size: 20px;">回到首页</a>
+</div>
+
+<div th:if="${needInput}">
+    <div class="card-container" id="cardContainer">
+        <!-- 扑克牌按钮将通过JavaScript动态生成 -->
+    </div>
+    <div class="container">
+        <label for="privateCards">你的手牌：</label>
+        <input type="text" id="privateCards" name="privateCards" placeholder="点击上方按钮">
+    </div>
+
+    <div class="card-container" id="flopCardContainer">
+        <!-- 扑克牌按钮将通过JavaScript动态生成 -->
+    </div>
+    <div class="container">
+        <label for="flopCards">flop牌面：</label>
+        <input type="text" id="flopCards" name="flopCards" placeholder="点击上方按钮">
+    </div>
+
+    <div class="position-container" id="positionContainer">
+        <!-- 位置按钮将通过JavaScript动态生成 -->
+    </div>
+    <div class="container">
+        <label for="position">你的位置：</label>
+        <input type="text" id="position" name="position" placeholder="点击上方按钮">
+    </div>
+
+    <div id="preflopActions" th:text="${preflopActions}" style="display: none"></div>
+    <a id="getStrategy" href="#">获取策略</a>
+
+    <script>
+        // 扑克牌的花色和数值
+        const suits = ['♠', '♥', '♣', '♦'];
+        const ranks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
+
+        const privateCardsInput = document.getElementById('privateCards');
+        function generatePrivateCards() {
+            // 获取容器和输入框元素
+            const cardContainer = document.getElementById('cardContainer');
+            cardContainer.innerHTML = ''; // 清空容器
+            for (let suit of suits) {
+                for (let rank of ranks) {
+                    const cardButton = document.createElement('button');
+                    cardButton.textContent = `${rank}${suit}`;
+                    cardButton.className = 'card-button';
+                    cardButton.onclick = function () {
+                        privateCardsInput.value = privateCardsInput.value + `${rank}${suit}`; // 更新输入框的值
+                    };
+                    cardContainer.appendChild(cardButton);
+                }
+            }
+        }
+
+        // 生成扑克牌按钮
+        const flopCardsInput = document.getElementById('flopCards');
+        function generateFlopCards() {
+            // 获取容器和输入框元素
+            const cardContainer = document.getElementById('flopCardContainer');
+            cardContainer.innerHTML = ''; // 清空容器
+            for (let suit of suits) {
+                for (let rank of ranks) {
+                    const cardButton = document.createElement('button');
+                    cardButton.textContent = `${rank}${suit}`;
+                    cardButton.className = 'card-button';
+                    cardButton.onclick = function () {
+                        flopCardsInput.value = flopCardsInput.value + `${rank}${suit}`; // 更新输入框的值
+                    };
+                    cardContainer.appendChild(cardButton);
+                }
+            }
+        }
+
+        const positions = ['ip', 'oop'];
+        const positionInput = document.getElementById("position");
+        function generatePositions() {
+            const positionContainer = document.getElementById("positionContainer");
+            positionContainer.innerHTML = '';
+            for (let pos of positions) {
+                const positionButton = document.createElement('button');
+                positionButton.textContent = `${pos}`;
+                positionButton.className = 'card-button';
+                positionButton.onclick = function () {
+                    positionInput.value = `${pos}`;
+                }
+                positionContainer.appendChild(positionButton);
+            }
+        }
+
+        // 初始化扑克牌
+        generatePrivateCards();
+        generateFlopCards();
+        generatePositions();
+
+        // 设置链接的href属性，使其包含输入框的值作为GET请求的参数
+        const getStrategyLink = document.getElementById('getStrategy');
+        const preflopActions = document.getElementById("preflopActions");
+        getStrategyLink.href = `#`;
+        getStrategyLink.onclick = function() {
+            if (!privateCardsInput.value.trim() || !flopCardsInput.value.trim() || !positionInput.value.trim()) {
+                alert("手牌、flop牌面和你的位置不能为空！");
+                return false;
+            }
+
+            getStrategyLink.href = `/postflop/flop?preflopActions=${preflopActions.textContent}&flopCards=${flopCardsInput.value}&privateCards=${privateCardsInput.value}&position=${positionInput.value}`;
+            return true;
+        };
+    </script>
+</div>
+
+<div th:unless="${needInput}">
+    <div class="container">
+        <div th:each="entry : ${strategy}">
+            <a th:href="@{/postflop/flop(preflopActions=${preflopActions}, flopCards=${flopCards}, privateCards=${privateCards}, position=${position}, postflopActions=${entry.getValue()})}"
+               th:text="${entry.getKey()}" style="font-size: 20px;"></a>
+        </div>
+    </div>
+
+    <div th:if="${postflopActions}">
+        <a th:href="@{/postflop/turn(preflopActions=${preflopActions}, flopCards=${flopCards}, privateCards=${privateCards}, position=${position}, postflopActions=${postflopActions})}" style="font-size: 20px;">进入Turn</a>
+    </div>
+</div>
+</body>
+</html>

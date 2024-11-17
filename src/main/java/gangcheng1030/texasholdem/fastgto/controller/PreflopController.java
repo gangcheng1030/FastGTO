@@ -68,6 +68,10 @@ public class PreflopController {
         model.addAttribute("nextActions", nextActions);
         model.addAttribute("nextActionNames", nextActionNames);
         model.addAttribute("randomNum", randomNum);
+        if (nodes.isEmpty()) {
+            model.addAttribute("enterFlop", true);
+            model.addAttribute("actions", parent);
+        }
         return "preflop";
     }
 }
