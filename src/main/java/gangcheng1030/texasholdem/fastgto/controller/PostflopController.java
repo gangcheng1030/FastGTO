@@ -19,8 +19,42 @@ import java.util.*;
 public class PostflopController {
     private static final Map<String, String> preflopConvertMap = new HashMap<>();
     static {
-        preflopConvertMap.put("LJ2bet:HJ3bet:COfold:BNfold:SBfold:BBfold:LJ4bet:HJcall", "HJ_VS_LJ_4BET");
+        preflopConvertMap.put("LJ2bet:HJfold:COfold:BNcall:SBfold:BBfold", "BN_VS_LJ_SRP"); // 这个是特殊的
+        preflopConvertMap.put("LJ2bet:HJfold:COfold:BNfold:SBfold:BBcall", "LJ_VS_BB_SRP");
+        preflopConvertMap.put("LJfold:HJfold:COfold:BN2bet:SBfold:BBcall", "BN_VS_BB_SRP");
+        preflopConvertMap.put("LJfold:HJfold:COfold:BNfold:SB2bet:BBcall", "BB_VS_SB_SRP");
+
+        preflopConvertMap.put("LJ2bet:HJ3bet:COfold:BNfold:SBfold:BBfold:LJcall", "HJ_VS_LJ_3BET");
+        preflopConvertMap.put("LJ2bet:HJfold:CO3bet:BNfold:SBfold:BBfold:LJcall", "CO_VS_LJ_3BET");
+        preflopConvertMap.put("LJfold:HJ2bet:CO3bet:BNfold:SBfold:BBfold:HJcall", "CO_VS_HJ_3BET");
+        preflopConvertMap.put("LJ2bet:HJfold:COfold:BN3bet:SBfold:BBfold:LJcall", "BN_VS_LJ_3BET");
+        preflopConvertMap.put("LJfold:HJ2bet:COfold:BN3bet:SBfold:BBfold:HJcall", "BN_VS_HJ_3BET");
+        preflopConvertMap.put("LJfold:HJfold:CO2bet:BN3bet:SBfold:BBfold:COcall", "BN_VS_CO_3BET");
+        preflopConvertMap.put("LJ2bet:HJfold:COfold:BNfold:SB3bet:BBfold:LJcall", "LJ_VS_SB_3BET");
+        preflopConvertMap.put("LJfold:HJ2bet:COfold:BNfold:SB3bet:BBfold:HJcall", "HJ_VS_SB_3BET");
+        preflopConvertMap.put("LJfold:HJfold:CO2bet:BNfold:SB3bet:BBfold:COcall", "CO_VS_SB_3BET");
         preflopConvertMap.put("LJfold:HJfold:COfold:BN2bet:SB3bet:BBfold:BNcall", "BN_VS_SB_3BET");
+        preflopConvertMap.put("LJfold:HJfold:COfold:BNfold:SB2bet:BB3bet:SBcall", "BB_VS_SB_3BET");
+        preflopConvertMap.put("LJ2bet:HJfold:COfold:BNfold:SBfold:BB3bet:LJcall", "LJ_VS_BB_3BET");
+        preflopConvertMap.put("LJfold:HJ2bet:COfold:BNfold:SBfold:BB3bet:HJcall", "HJ_VS_BB_3BET");
+        preflopConvertMap.put("LJfold:HJfold:CO2bet:BNfold:SBfold:BB3bet:COcall", "CO_VS_BB_3BET");
+        preflopConvertMap.put("LJfold:HJfold:COfold:BN2bet:SBfold:BB3bet:BNcall", "BN_VS_BB_3BET");
+
+        preflopConvertMap.put("LJ2bet:HJ3bet:COfold:BNfold:SBfold:BBfold:LJ4bet:HJcall", "HJ_VS_LJ_4BET");
+        preflopConvertMap.put("LJ2bet:HJfold:CO3bet:BNfold:SBfold:BBfold:LJ4bet:COcall", "CO_VS_LJ_4BET");
+        preflopConvertMap.put("LJfold:HJ2bet:CO3bet:BNfold:SBfold:BBfold:HJ4bet:COcall", "CO_VS_HJ_4BET");
+        preflopConvertMap.put("LJ2bet:HJfold:COfold:BN3bet:SBfold:BBfold:LJ4bet:BNcall", "BN_VS_LJ_4BET");
+        preflopConvertMap.put("LJfold:HJ2bet:COfold:BN3bet:SBfold:BBfold:HJ4bet:BNcall", "BN_VS_HJ_4BET");
+        preflopConvertMap.put("LJfold:HJfold:CO2bet:BN3bet:SBfold:BBfold:CO4bet:BNcall", "BN_VS_CO_4BET");
+        preflopConvertMap.put("LJ2bet:HJfold:COfold:BNfold:SB3bet:BBfold:LJ4bet:SBcall", "LJ_VS_SB_4BET");
+        preflopConvertMap.put("LJfold:HJ2bet:COfold:BNfold:SB3bet:BBfold:HJ4bet:SBcall", "HJ_VS_SB_4BET");
+        preflopConvertMap.put("LJfold:HJfold:CO2bet:BNfold:SB3bet:BBfold:CO4bet:SBcall", "CO_VS_SB_4BET");
+        preflopConvertMap.put("LJfold:HJfold:COfold:BN2bet:SB3bet:BBfold:BN4bet:SBcall", "BN_VS_SB_4BET");
+        preflopConvertMap.put("LJfold:HJfold:COfold:BNfold:SB2bet:BB3bet:SB4bet:BBcall", "BB_VS_SB_4BET");
+        preflopConvertMap.put("LJ2bet:HJfold:COfold:BNfold:SBfold:BB3bet:LJ4bet:BBcall", "LJ_VS_BB_4BET");
+        preflopConvertMap.put("LJfold:HJ2bet:COfold:BNfold:SBfold:BB3bet:HJ4bet:BBcall", "HJ_VS_BB_4BET");
+        preflopConvertMap.put("LJfold:HJfold:CO2bet:BNfold:SBfold:BB3bet:CO4bet:BBcall", "CO_VS_BB_4BET");
+        preflopConvertMap.put("LJfold:HJfold:COfold:BN2bet:SBfold:BB3bet:BN4bet:BBcall", "BN_VS_BB_4BET");
     }
 
     @Autowired
@@ -260,7 +294,8 @@ public class PostflopController {
         for (Card c : flopCards) {
             flopCardSuits += c.getSuit();
         }
-        Map<String, String> convertRules = FlopCardConvertUtil.getConvertRule(flopCardSuits);
+        boolean formerTwoIsEqual = flopCards.get(0).getRank().equals(flopCards.get(1).getRank());
+        Map<String, String> convertRules = FlopCardConvertUtil.getConvertRule(flopCardSuits, formerTwoIsEqual);
         return postflopService.convertCard(new Card(card), convertRules);
     }
 }

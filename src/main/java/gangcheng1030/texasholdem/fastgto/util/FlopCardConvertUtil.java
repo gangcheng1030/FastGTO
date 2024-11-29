@@ -5,10 +5,15 @@ import java.util.Map;
 
 public class FlopCardConvertUtil {
     private static final Map<String, Map<String, String>> converRuleMap = new HashMap<>();
+    private static final Map<String, Map<String, String>> formerTwoEqualRuleMap = new HashMap<>();
 
-    public static Map<String, String> getConvertRule(String cardSuits) {
+    public static Map<String, String> getConvertRule(String cardSuits, boolean formerTwoEqual) {
+        if (formerTwoEqual && cardSuits.charAt(0) == cardSuits.charAt(2)) {
+            return formerTwoEqualRuleMap.get(cardSuits);
+        }
         return converRuleMap.get(cardSuits);
     }
+
     // cdhs
     static {
         converRuleMap.put("ccc", new HashMap<>());
@@ -46,12 +51,12 @@ public class FlopCardConvertUtil {
         converRuleMap.put("dhh", new HashMap<>(){{put("d", "c"); put("h", "d"); put("c", "h");}});
         converRuleMap.put("dhs", new HashMap<>(){{put("d", "c"); put("h", "d"); put("s", "h"); put("c", "s");}});
 
-        converRuleMap.put("dsc", new HashMap<>(){{put("d", "c"); put("s", "d"); put("c", "s");}});
+        converRuleMap.put("dsc", new HashMap<>(){{put("d", "c"); put("s", "d"); put("c", "h"); put("h", "s");}});
         converRuleMap.put("dsd", new HashMap<>(){{put("d", "c"); put("s", "d"); put("c", "s");}});
         converRuleMap.put("dsh", new HashMap<>(){{put("d", "c"); put("s", "d"); put("c", "s");}});
         converRuleMap.put("dss", new HashMap<>(){{put("d", "c"); put("s", "d"); put("c", "s");}});
 
-        converRuleMap.put("hcc", new HashMap<>(){{put("h", "c"); put("c", "h");}});
+        converRuleMap.put("hcc", new HashMap<>(){{put("h", "c"); put("c", "d"); put("d", "h");}});
         converRuleMap.put("hcd", new HashMap<>(){{put("h", "c"); put("c", "d"); put("d", "h");}});
         converRuleMap.put("hch", new HashMap<>(){{put("h", "c"); put("c", "d"); put("d", "h");}});
         converRuleMap.put("hcs", new HashMap<>(){{put("h", "c"); put("c", "d"); put("s", "h"); put("d", "s");}});
@@ -67,7 +72,7 @@ public class FlopCardConvertUtil {
         converRuleMap.put("hhs", new HashMap<>(){{put("h", "c"); put("c", "h"); put("s", "d"); put("d", "s");}});
 
         converRuleMap.put("hsc", new HashMap<>(){{put("h", "c"); put("s", "d"); put("c", "h"); put("d", "s");}});
-        converRuleMap.put("hsd", new HashMap<>(){{put("h", "c"); put("s", "d"); put("c", "h"); put("d", "s");}});
+        converRuleMap.put("hsd", new HashMap<>(){{put("h", "c"); put("s", "d"); put("d", "h"); put("c", "s");}});
         converRuleMap.put("hsh", new HashMap<>(){{put("h", "c"); put("s", "d"); put("c", "h"); put("d", "s");}});
         converRuleMap.put("hss", new HashMap<>(){{put("h", "c"); put("s", "d"); put("c", "h"); put("d", "s");}});
 
@@ -76,7 +81,7 @@ public class FlopCardConvertUtil {
         converRuleMap.put("sch", new HashMap<>(){{put("s", "c"); put("c", "d"); put("d", "s");}});
         converRuleMap.put("scs", new HashMap<>(){{put("s", "c"); put("c", "d"); put("d", "s");}});
 
-        converRuleMap.put("sdc", new HashMap<>(){{put("s", "c"); put("c", "s");}});
+        converRuleMap.put("sdc", new HashMap<>(){{put("s", "c"); put("c", "h"); put("h", "s");}});
         converRuleMap.put("sdd", new HashMap<>(){{put("s", "c"); put("c", "s");}});
         converRuleMap.put("sdh", new HashMap<>(){{put("s", "c"); put("c", "s");}});
         converRuleMap.put("sds", new HashMap<>(){{put("s", "c"); put("c", "s");}});
@@ -90,5 +95,13 @@ public class FlopCardConvertUtil {
         converRuleMap.put("ssd", new HashMap<>(){{put("s", "c"); put("c", "s");}});
         converRuleMap.put("ssh", new HashMap<>(){{put("s", "c"); put("h", "d"); put("c", "s"); put("d", "h");}});
         converRuleMap.put("sss", new HashMap<>(){{put("s", "c"); put("c", "s");}});
+
+        // -----------------------------------  分割线  -----------------------------------
+        formerTwoEqualRuleMap.put("cdc", new HashMap<>(){{put("c", "d"); put("d", "c");}});
+        formerTwoEqualRuleMap.put("chc", new HashMap<>(){{put("c", "d"); put("h", "c"); put("d", "h");}});
+        formerTwoEqualRuleMap.put("csc", new HashMap<>(){{put("c", "d"); put("s", "c"); put("d", "s");}});
+        formerTwoEqualRuleMap.put("dhd", new HashMap<>(){{put("h", "c"); put("c", "h");}});
+        formerTwoEqualRuleMap.put("dsd", new HashMap<>(){{put("s", "c"); put("c", "s");}});
+        formerTwoEqualRuleMap.put("hsh", new HashMap<>(){{put("s", "c"); put("c", "s"); put("h", "d"); put("d", "h");}});
     }
 }

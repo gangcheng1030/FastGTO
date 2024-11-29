@@ -11,6 +11,7 @@ public class PreflopTreeBuilder {
     public static PreflopTreeNode buildPreflopTree(String directoryPath) throws IOException {
         PreflopTreeNode rootNode = buildPreflopTreeRecursive(directoryPath, true);
         rootNode = rewritePreflopTree(rootNode);
+        rootNode = rewritePreflopTree2(rootNode);
         return rootNode;
     }
 
@@ -53,6 +54,38 @@ public class PreflopTreeBuilder {
         root.setChildren(newChildren);
         for (PreflopTreeNode node : root.getChildren().values()) {
             rewritePreflopTree(node);
+        }
+
+        return root;
+    }
+
+    // 补充 BBfolds
+    private static PreflopTreeNode rewritePreflopTree2(PreflopTreeNode root) {
+        if (root == null) {
+            return null;
+        }
+
+        if (root.getChildren().isEmpty()) {
+            return root;
+        }
+
+        boolean isBBNode = false;
+        boolean containFoldsNode = false;
+        for (Map.Entry<String, PreflopTreeNode> entry : root.getChildren().entrySet()) {
+            if (entry.getValue().getPosition().equals(Constants.POSITION_BB)) {
+                isBBNode = true;
+            }
+            if (entry.getKey().contains("fold")) {
+                containFoldsNode = true;
+            }
+        }
+        if (isBBNode && !containFoldsNode) {
+            PreflopTreeNode node = new PreflopTreeNode("BBfold", "fold", "BB");
+            root.getChildren().put("BBfold", node);
+        }
+
+        for (PreflopTreeNode node : root.getChildren().values()) {
+            rewritePreflopTree2(node);
         }
 
         return root;

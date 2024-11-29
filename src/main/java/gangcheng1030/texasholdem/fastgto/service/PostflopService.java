@@ -1,8 +1,12 @@
 package gangcheng1030.texasholdem.fastgto.service;
 
+import com.alibaba.fastjson.JSON;
 import gangcheng1030.texasholdem.fastgto.core.*;
+import gangcheng1030.texasholdem.fastgto.dao.PostflopRepository;
+import gangcheng1030.texasholdem.fastgto.core.NodeType;
 import gangcheng1030.texasholdem.fastgto.exceptions.CardsNotFoundException;
 import gangcheng1030.texasholdem.fastgto.exceptions.StrategyNotFoundException;
+import gangcheng1030.texasholdem.fastgto.po.Postflop;
 import gangcheng1030.texasholdem.fastgto.util.FlopCardConvertUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,17 +18,21 @@ public class PostflopService {
     @Autowired
     private PostflopTreeManager postflopTreeManager;
 
+    @Autowired
+    private PostflopRepository postflopRepository;
+
     public TreeMap<String, Double> getStrategy(String preflopActions, List<Card> flopCards, List<Card> privateCards, int player, List<String> postflopActions) {
         String flopCardSuits = "";
         for (Card c : flopCards) {
             flopCardSuits += c.getSuit();
         }
-        Map<String, String> convertRules = FlopCardConvertUtil.getConvertRule(flopCardSuits);
+        boolean formerTwoIsEqual = flopCards.get(0).getRank().equals(flopCards.get(1).getRank());
+        Map<String, String> convertRules = FlopCardConvertUtil.getConvertRule(flopCardSuits, formerTwoIsEqual);
         if (convertRules == null) {
             throw new CardsNotFoundException("不存在的花色");
         }
-        List<Card> innerFlopCards = convertCardList(flopCards, convertRules);
-        List<Card> innerPrivateCards = convertCardList(privateCards, convertRules);
+        List<Card> innerFlopCards = convertCardList(flopCards, convertRules, false);
+        List<Card> innerPrivateCards = convertCardList(privateCards, convertRules, true);
 
         String flopCardsStr = convertCardsToString(innerFlopCards);
         PostflopTreeNode root = postflopTreeManager.get(preflopActions, flopCardsStr);
@@ -61,27 +69,74 @@ public class PostflopService {
         return res;
     }
 
-    public List<Card> convertFlopCards(List<Card> srcFlopCards, Map<String, String> convertRules) {
-        List<Card> dstFlopCards = new ArrayList<>();
-        if (!srcFlopCards.get(0).getSuit().equals("c")) {
-            convertRules.put(srcFlopCards.get(0).getSuit(), "c");
+    public TreeMap<String, Double> getStrategyByDB(String preflopActions, List<Card> flopCards, List<Card> privateCards, int player, List<String> postflopActions) {
+        String flopCardSuits = "";
+        for (Card c : flopCards) {
+            flopCardSuits += c.getSuit();
         }
-        dstFlopCards.add(convertCard(srcFlopCards.get(0), convertRules));
-
-        if (!srcFlopCards.get(1).getSuit().equals(srcFlopCards.get(0).getSuit())
-                && !srcFlopCards.get(1).getSuit().equals("d")) {
-            convertRules.put(srcFlopCards.get(1).getSuit(), "d");
+        boolean formerTwoIsEqual = flopCards.get(0).getRank().equals(flopCards.get(1).getRank());
+        Map<String, String> convertRules = FlopCardConvertUtil.getConvertRule(flopCardSuits, formerTwoIsEqual);
+        if (convertRules == null) {
+            throw new CardsNotFoundException("不存在的花色");
         }
-        dstFlopCards.add(convertCard(srcFlopCards.get(1), convertRules));
+        List<Card> innerFlopCards = convertCardList(flopCards, convertRules, false);
+        List<Card> innerPrivateCards = convertCardList(privateCards, convertRules, true);
 
-        if (!srcFlopCards.get(2).getSuit().equals(srcFlopCards.get(0).getSuit())
-                && !srcFlopCards.get(2).getSuit().equals(srcFlopCards.get(1).getSuit())
-                && !srcFlopCards.get(2).getSuit().equals("h")) {
-            convertRules.put(srcFlopCards.get(2).getSuit(), "h");
+        String flopCardsStr = convertCardsToString(innerFlopCards);
+        Postflop root = postflopRepository.findFirstByFlopCardsAndParentAndPreflopActions(flopCardsStr, 0, preflopActions);
+        if (root == null) {
+            throw new StrategyNotFoundException("找不到相应的策略树");
         }
-        dstFlopCards.add(convertCard(srcFlopCards.get(2), convertRules));
 
-        return dstFlopCards;
+        return null;
+    }
+
+    private Postflop getPostflopByPostflopActions(String flopCards, Integer parent, List<String> postflopActions) {
+        return null;
+    }
+
+    public void importPostflopTree(PostflopTreeNode root, String preflopActions, String flopCards) {
+        Postflop postflop = new Postflop();
+        postflop.setPreflopActions(preflopActions);
+        postflop.setFlopCards(flopCards);
+        postflop.setParent(0);
+        postflop.setPlayer(root.getPlayer());
+        postflop.setNodeType(NodeType.typeToId(root.getNode_type()));
+        CompressedStrategy compressedStrategy = root.getStrategy().compress();
+        postflop.setStrategy(JSON.toJSONString(compressedStrategy));
+
+        Postflop savedPostflop = postflopRepository.save(postflop);
+        Map<String, PostflopTreeNode> children = root.getChildrens();
+        for (String action : children.keySet()) {
+            importPostflopTreeInner(children.get(action), savedPostflop.getId(), flopCards, action);
+        }
+    }
+
+    private void importPostflopTreeInner(PostflopTreeNode root, int parent, String flopCards, String action) {
+        Postflop postflop = new Postflop();
+        postflop.setFlopCards(flopCards);
+        postflop.setParent(parent);
+        postflop.setPlayer(root.getPlayer());
+        postflop.setNodeType(NodeType.typeToId(root.getNode_type()));
+        postflop.setAction(action);
+        if (root.getStrategy() != null) {
+            CompressedStrategy compressedStrategy = root.getStrategy().compress();
+            postflop.setStrategy(JSON.toJSONString(compressedStrategy));
+        }
+
+        Postflop savedPostflop = postflopRepository.save(postflop);
+        Map<String, PostflopTreeNode> children = null;
+        if (root.getNode_type().equals(NodeType.ACTION_NODE.getType())) {
+            children = root.getChildrens();
+        } else {
+            children = root.getDealcards();
+        }
+
+        if (children != null) {
+            for (String childAction : children.keySet()) {
+                importPostflopTreeInner(children.get(childAction), savedPostflop.getId(), flopCards, childAction);
+            }
+        }
     }
 
     public Card convertCard(Card src, Map<String, String> convertRules) {
@@ -94,12 +149,15 @@ public class PostflopService {
         return new Card(dstCard);
     }
 
-    private List<Card> convertCardList(List<Card> srcList, Map<String, String> convertRules) {
+    private List<Card> convertCardList(List<Card> srcList, Map<String, String> convertRules, boolean reverse) {
         List<Card> dstList = new ArrayList<>();
         for (Card src : srcList) {
             dstList.add(convertCard(src, convertRules));
         }
-
+        Collections.sort(dstList);
+        if (reverse) {
+            Collections.reverse(dstList);
+        }
         return dstList;
     }
 

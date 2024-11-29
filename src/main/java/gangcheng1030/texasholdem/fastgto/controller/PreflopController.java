@@ -48,7 +48,9 @@ public class PreflopController {
             nextActions.add(next);
             nextActionNames.add(node.getName());
             if (node.getAction().equals(Constants.ACTION_RAISE) || node.getAction().contains(Constants.ACTION_BET)) {
-                raiseWeights = node.getRangesArr();
+                if (node.getRangesArr() != null) {
+                    raiseWeights = node.getRangesArr();
+                }
             } else if (node.getAction().equals(Constants.ACTION_CALL)) {
                 callWeights = node.getRangesArr();
             }

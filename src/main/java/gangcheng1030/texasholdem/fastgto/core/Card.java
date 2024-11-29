@@ -28,6 +28,10 @@ public class Card implements Comparable<Card> {
         return this.card.substring(1);
     }
 
+    public String getRank() {
+        return this.card.substring(0, 1);
+    }
+
     @Override
     public int compareTo(Card o) {
         return this.getCardInt() - o.getCardInt();

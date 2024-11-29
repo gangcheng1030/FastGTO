@@ -27,12 +27,11 @@ public class PostflopTreeManager {
     }
 
     private PostflopTreeNode getFromStorage(String name) {
-        ClassLoader classLoader = getClass().getClassLoader();
-        String filePath = "PostflopRanges_nlhe_100bb/" + name + ".json";
+        String filePath = "/Volumes/Elements/PostflopRanges_nlhe_100bb/" + name + ".json";
 
         try {
             // 读取文件内容到字符串
-            String content = new String(Files.readAllBytes(Paths.get(classLoader.getResource(filePath).getFile())));
+            String content = new String(Files.readAllBytes(Paths.get(filePath)));
             return JSON.parseObject(content, PostflopTreeNode.class);
         } catch (IOException e) {
             e.printStackTrace();

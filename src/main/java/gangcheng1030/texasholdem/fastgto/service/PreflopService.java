@@ -1,7 +1,7 @@
 package gangcheng1030.texasholdem.fastgto.service;
 
 import gangcheng1030.texasholdem.fastgto.dao.PreflopRepository;
-import gangcheng1030.texasholdem.fastgto.dto.Preflop;
+import gangcheng1030.texasholdem.fastgto.po.Preflop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
