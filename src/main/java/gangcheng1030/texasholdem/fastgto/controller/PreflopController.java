@@ -4,7 +4,6 @@ import gangcheng1030.texasholdem.fastgto.core.Constants;
 import gangcheng1030.texasholdem.fastgto.core.PreflopTree;
 import gangcheng1030.texasholdem.fastgto.core.PreflopTreeNode;
 import gangcheng1030.texasholdem.fastgto.core.PrivateCardsConverter;
-import gangcheng1030.texasholdem.fastgto.service.PreflopService;
 import gangcheng1030.texasholdem.fastgto.util.RandomGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,9 +20,6 @@ import java.util.Map;
 @Controller
 @RequestMapping("/preflop")
 public class PreflopController {
-    @Autowired
-    private PreflopService preflopService;
-
     @Autowired
     private PreflopTree preflopTree;
 

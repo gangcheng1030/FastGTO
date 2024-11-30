@@ -1,10 +1,11 @@
 package gangcheng1030.texasholdem.fastgto.core;
 
+import gangcheng1030.texasholdem.fastgto.exceptions.RangesIllegalException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class PreflopTree {
@@ -32,6 +33,36 @@ public class PreflopTree {
         }
 
         return curNode.getChildren();
+    }
+
+    public List<String> getSoloRanges(String[] names) {
+        TreeMap<Position, String> allRanges = getAllRanges(names);
+        if (allRanges.size() != 2) {
+            throw new RangesIllegalException("该行动线不是solo");
+        }
+
+        List<String> res = new ArrayList<>();
+        res.add(allRanges.firstEntry().getValue());
+        res.add(allRanges.lastEntry().getValue());
+        return res;
+    }
+
+    public TreeMap<Position, String> getAllRanges(String[] names) {
+        TreeMap<Position, String> res = new TreeMap<>();
+        PreflopTreeNode curNode = root;
+        for (String name : names) {
+            String curPosition = parsePosition(name);
+            String curAction = parseAction(name);
+            curNode = search(curNode, curPosition, curAction);
+            if (curNode == null) {
+                return new TreeMap<>();
+            }
+            if (!StringUtils.isEmpty(curNode.getRanges())) {
+                res.put(Position.getByName(curNode.getPosition()), curNode.getRanges());
+            }
+        }
+
+        return res;
     }
 
     public Double[] getRaiseRanges(String position, String[] names) {

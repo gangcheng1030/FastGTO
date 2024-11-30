@@ -86,4 +86,8 @@ public class PrivateCards {
             return new int[]{card2,card1};
         }
     }
+
+    public float getWeight() {
+        return weight;
+    }
 }

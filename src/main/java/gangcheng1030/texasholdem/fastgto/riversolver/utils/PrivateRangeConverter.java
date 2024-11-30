@@ -3,9 +3,7 @@ package gangcheng1030.texasholdem.fastgto.riversolver.utils;
 import gangcheng1030.texasholdem.fastgto.riversolver.Card;
 import gangcheng1030.texasholdem.fastgto.riversolver.ranges.PrivateCards;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class PrivateRangeConverter {
     public static PrivateCards[] rangeStr2Cards(String range_str,int[] initial_boards){
@@ -128,5 +126,25 @@ public class PrivateRangeConverter {
         System.out.println();
          */
         return private_cards_list;
+    }
+
+    public static TreeMap<String, Double> rangeStr2CardsMap(String range_str,int[] initial_boards) {
+        PrivateCards[] cards = rangeStr2Cards(range_str, initial_boards);
+        TreeMap<String, Double> res = new TreeMap<>();
+        for (PrivateCards privateCards : cards) {
+            res.put(privateCards.toString(), (double)(privateCards.getWeight()));
+        }
+        return res;
+    }
+
+    public static PrivateCards[] map2Cards(TreeMap<String, Double> cardsMap) {
+        List<PrivateCards> privateCardsList = new ArrayList<>(cardsMap.size());
+        for (Map.Entry<String, Double> entry: cardsMap.entrySet()) {
+            int card1 = Card.strCard2int(entry.getKey().substring(0, 2));
+            int card2 = Card.strCard2int(entry.getKey().substring(2, 4));
+            privateCardsList.add(new PrivateCards(card1, card2, entry.getValue().floatValue()));
+        }
+
+        return privateCardsList.toArray(new PrivateCards[privateCardsList.size()]);
     }
 }

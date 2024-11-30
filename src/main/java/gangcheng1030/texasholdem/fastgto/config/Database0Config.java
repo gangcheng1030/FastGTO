@@ -21,6 +21,25 @@ public class Database0Config {
         result.setUrl(getUrl());
         result.setUsername(getUsername());
         result.setPassword(getPassword());
+
+        // 设置初始连接数和最大连接数
+        result.setInitialSize(8);
+        result.setMaxActive(16);
+
+        // 配置获取连接等待超时的时间
+        result.setMaxWait(60000);
+
+        // 配置间隔多久进行一次检测，检测需要关闭的空闲连接
+        result.setTimeBetweenEvictionRunsMillis(60000);
+
+        // 配置一个连接在池中最小生存的时间
+        result.setMinEvictableIdleTimeMillis(300000);
+
+        // 验证连接有效与否的SQL
+        result.setValidationQuery("SELECT 1");
+        result.setTestWhileIdle(true);
+        result.setTestOnBorrow(false);
+        result.setTestOnReturn(false);
         return result;
     }
 

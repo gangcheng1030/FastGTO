@@ -4,6 +4,7 @@ import gangcheng1030.texasholdem.fastgto.core.Card;
 import gangcheng1030.texasholdem.fastgto.service.PostflopService;
 import gangcheng1030.texasholdem.fastgto.util.FlopCardConvertUtil;
 import gangcheng1030.texasholdem.fastgto.util.RandomGenerator;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,46 +18,6 @@ import java.util.*;
 @Controller
 @RequestMapping("/postflop")
 public class PostflopController {
-    private static final Map<String, String> preflopConvertMap = new HashMap<>();
-    static {
-        preflopConvertMap.put("LJ2bet:HJfold:COfold:BNcall:SBfold:BBfold", "BN_VS_LJ_SRP"); // 这个是特殊的
-        preflopConvertMap.put("LJ2bet:HJfold:COfold:BNfold:SBfold:BBcall", "LJ_VS_BB_SRP");
-        preflopConvertMap.put("LJfold:HJfold:COfold:BN2bet:SBfold:BBcall", "BN_VS_BB_SRP");
-        preflopConvertMap.put("LJfold:HJfold:COfold:BNfold:SB2bet:BBcall", "BB_VS_SB_SRP");
-
-        preflopConvertMap.put("LJ2bet:HJ3bet:COfold:BNfold:SBfold:BBfold:LJcall", "HJ_VS_LJ_3BET");
-        preflopConvertMap.put("LJ2bet:HJfold:CO3bet:BNfold:SBfold:BBfold:LJcall", "CO_VS_LJ_3BET");
-        preflopConvertMap.put("LJfold:HJ2bet:CO3bet:BNfold:SBfold:BBfold:HJcall", "CO_VS_HJ_3BET");
-        preflopConvertMap.put("LJ2bet:HJfold:COfold:BN3bet:SBfold:BBfold:LJcall", "BN_VS_LJ_3BET");
-        preflopConvertMap.put("LJfold:HJ2bet:COfold:BN3bet:SBfold:BBfold:HJcall", "BN_VS_HJ_3BET");
-        preflopConvertMap.put("LJfold:HJfold:CO2bet:BN3bet:SBfold:BBfold:COcall", "BN_VS_CO_3BET");
-        preflopConvertMap.put("LJ2bet:HJfold:COfold:BNfold:SB3bet:BBfold:LJcall", "LJ_VS_SB_3BET");
-        preflopConvertMap.put("LJfold:HJ2bet:COfold:BNfold:SB3bet:BBfold:HJcall", "HJ_VS_SB_3BET");
-        preflopConvertMap.put("LJfold:HJfold:CO2bet:BNfold:SB3bet:BBfold:COcall", "CO_VS_SB_3BET");
-        preflopConvertMap.put("LJfold:HJfold:COfold:BN2bet:SB3bet:BBfold:BNcall", "BN_VS_SB_3BET");
-        preflopConvertMap.put("LJfold:HJfold:COfold:BNfold:SB2bet:BB3bet:SBcall", "BB_VS_SB_3BET");
-        preflopConvertMap.put("LJ2bet:HJfold:COfold:BNfold:SBfold:BB3bet:LJcall", "LJ_VS_BB_3BET");
-        preflopConvertMap.put("LJfold:HJ2bet:COfold:BNfold:SBfold:BB3bet:HJcall", "HJ_VS_BB_3BET");
-        preflopConvertMap.put("LJfold:HJfold:CO2bet:BNfold:SBfold:BB3bet:COcall", "CO_VS_BB_3BET");
-        preflopConvertMap.put("LJfold:HJfold:COfold:BN2bet:SBfold:BB3bet:BNcall", "BN_VS_BB_3BET");
-
-        preflopConvertMap.put("LJ2bet:HJ3bet:COfold:BNfold:SBfold:BBfold:LJ4bet:HJcall", "HJ_VS_LJ_4BET");
-        preflopConvertMap.put("LJ2bet:HJfold:CO3bet:BNfold:SBfold:BBfold:LJ4bet:COcall", "CO_VS_LJ_4BET");
-        preflopConvertMap.put("LJfold:HJ2bet:CO3bet:BNfold:SBfold:BBfold:HJ4bet:COcall", "CO_VS_HJ_4BET");
-        preflopConvertMap.put("LJ2bet:HJfold:COfold:BN3bet:SBfold:BBfold:LJ4bet:BNcall", "BN_VS_LJ_4BET");
-        preflopConvertMap.put("LJfold:HJ2bet:COfold:BN3bet:SBfold:BBfold:HJ4bet:BNcall", "BN_VS_HJ_4BET");
-        preflopConvertMap.put("LJfold:HJfold:CO2bet:BN3bet:SBfold:BBfold:CO4bet:BNcall", "BN_VS_CO_4BET");
-        preflopConvertMap.put("LJ2bet:HJfold:COfold:BNfold:SB3bet:BBfold:LJ4bet:SBcall", "LJ_VS_SB_4BET");
-        preflopConvertMap.put("LJfold:HJ2bet:COfold:BNfold:SB3bet:BBfold:HJ4bet:SBcall", "HJ_VS_SB_4BET");
-        preflopConvertMap.put("LJfold:HJfold:CO2bet:BNfold:SB3bet:BBfold:CO4bet:SBcall", "CO_VS_SB_4BET");
-        preflopConvertMap.put("LJfold:HJfold:COfold:BN2bet:SB3bet:BBfold:BN4bet:SBcall", "BN_VS_SB_4BET");
-        preflopConvertMap.put("LJfold:HJfold:COfold:BNfold:SB2bet:BB3bet:SB4bet:BBcall", "BB_VS_SB_4BET");
-        preflopConvertMap.put("LJ2bet:HJfold:COfold:BNfold:SBfold:BB3bet:LJ4bet:BBcall", "LJ_VS_BB_4BET");
-        preflopConvertMap.put("LJfold:HJ2bet:COfold:BNfold:SBfold:BB3bet:HJ4bet:BBcall", "HJ_VS_BB_4BET");
-        preflopConvertMap.put("LJfold:HJfold:CO2bet:BNfold:SBfold:BB3bet:CO4bet:BBcall", "CO_VS_BB_4BET");
-        preflopConvertMap.put("LJfold:HJfold:COfold:BN2bet:SBfold:BB3bet:BN4bet:BBcall", "BN_VS_BB_4BET");
-    }
-
     @Autowired
     private PostflopService postflopService;
 
@@ -68,11 +29,6 @@ public class PostflopController {
                               @RequestParam(value = "postflopActions", required = false) String postflopActions,
                               Model model) {
         model.addAttribute("preflopActions", preflopActions);
-        String innerPreflopActions = preflopConvertMap.get(preflopActions);
-        if (innerPreflopActions == null) {
-            model.addAttribute("errMsg", "翻前动作不合法");
-            return "error";
-        }
 
         if (StringUtils.isEmpty(flopCards) || StringUtils.isEmpty(privateCards)) {
             model.addAttribute("needInput", true);
@@ -80,7 +36,9 @@ public class PostflopController {
         }
 
         List<Card> flopCardList = convertFlopCards(flopCards);
-        List<Card> privateCardList = convertPrivateCards(privateCards);
+        Map<String, String> convertRules = getConvertRules(flopCardList);
+        flopCardList = convertCardListByRules(flopCardList, convertRules, false);
+        List<Card> privateCardList = convertPrivateCards(privateCards, convertRules);
         List<String> postflopActionList = new ArrayList<>();
         if (postflopActions != null) {
             postflopActionList = Arrays.asList(postflopActions.split(":"));
@@ -88,7 +46,7 @@ public class PostflopController {
         int player = position.equals("ip") ? 0 : 1;
         TreeMap<String, Double> strategy = null;
         try {
-            strategy = postflopService.getStrategy(innerPreflopActions, flopCardList, privateCardList, player, postflopActionList);
+            strategy = postflopService.getStrategyByDB(preflopActions, flopCardList, privateCardList, player, postflopActionList);
         } catch (RuntimeException e) {
             model.addAttribute("errMsg", e.getMessage());
             return "error";
@@ -139,17 +97,13 @@ public class PostflopController {
             return "turn";
         }
 
-        String innerPreflopActions = preflopConvertMap.get(preflopActions);
-        if (innerPreflopActions == null) {
-            model.addAttribute("errMsg", "翻前动作不合法");
-            return "error";
-        }
-
         List<Card> flopCardList = convertFlopCards(flopCards);
-        List<Card> privateCardList = convertPrivateCards(privateCards);
+        Map<String, String> convertRules = getConvertRules(flopCardList);
+        flopCardList = convertCardListByRules(flopCardList, convertRules, false);
+        List<Card> privateCardList = convertPrivateCards(privateCards, convertRules);
         List<String> postflopActionList = new ArrayList<>(Arrays.asList(postflopActions.split(":")));
         if (notChance == null || !notChance) {
-            Card innerTurnCard = convertCard(flopCardList, turnCard);
+            Card innerTurnCard = convertCard(turnCard, convertRules);
             postflopActionList.add(innerTurnCard.getCard());
             postflopActions += ":" + innerTurnCard.getCard();
             model.addAttribute("postflopActions", postflopActions);
@@ -157,7 +111,7 @@ public class PostflopController {
         int player = position.equals("ip") ? 0 : 1;
         TreeMap<String, Double> strategy = null;
         try {
-            strategy = postflopService.getStrategy(innerPreflopActions, flopCardList, privateCardList, player, postflopActionList);
+            strategy = postflopService.getStrategyByDB(preflopActions, flopCardList, privateCardList, player, postflopActionList);
         } catch (RuntimeException e) {
             model.addAttribute("errMsg", e.getMessage());
             return "error";
@@ -192,40 +146,50 @@ public class PostflopController {
                                   @RequestParam(value = "privateCards") String privateCards,
                                   @RequestParam(value = "position") String position,
                                   @RequestParam(value = "postflopActions") String postflopActions,
+                                  @RequestParam(value = "turnCard") String turnCard,
                                   @RequestParam(value = "riverCard", required = false) String riverCard,
-                                  @RequestParam(value = "notChance", required = false) Boolean notChance,
+                                  @RequestParam(value = "pot", required = false) Integer pot,
+                                  @RequestParam(value = "effectiveStack", required = false) Integer effectiveStack,
+                                  @RequestParam(value = "riverActions", required = false) String riverActions,
                                   Model model) {
         model.addAttribute("preflopActions", preflopActions);
         model.addAttribute("flopCards", flopCards);
         model.addAttribute("privateCards", privateCards);
         model.addAttribute("position", position);
         model.addAttribute("postflopActions", postflopActions);
+        model.addAttribute("turnCard", turnCard);
 
         if (StringUtils.isEmpty(riverCard)) {
             model.addAttribute("needInput", true);
             return "river";
         }
 
-        String innerPreflopActions = preflopConvertMap.get(preflopActions);
-        if (innerPreflopActions == null) {
-            model.addAttribute("errMsg", "翻前动作不合法");
-            return "error";
-        }
-
         List<Card> flopCardList = convertFlopCards(flopCards);
-        List<Card> privateCardList = convertPrivateCards(privateCards);
+        Map<String, String> convertRules = getConvertRules(flopCardList);
+        flopCardList = convertCardListByRules(flopCardList, convertRules, false);
+        List<Card> privateCardList = convertPrivateCards(privateCards, convertRules);
         List<String> postflopActionList = new ArrayList<>(Arrays.asList(postflopActions.split(":")));
-        if (notChance == null || !notChance) {
-            Card innerTurnCard = convertCard(flopCardList, riverCard);
-            postflopActionList.add(innerTurnCard.getCard());
-            postflopActions += ":" + innerTurnCard.getCard();
-            model.addAttribute("postflopActions", postflopActions);
-        }
+        Card innerTurnCard = convertCard(turnCard, convertRules);
+        Card innerRiverCard = convertCard(riverCard, convertRules);
         int player = position.equals("ip") ? 0 : 1;
+        List<String> riverActionList = new ArrayList<>();
+        if (!StringUtils.isEmpty(riverActions)) {
+            riverActionList = Arrays.asList(riverActions.split(":"));
+        }
         TreeMap<String, Double> strategy = null;
         try {
-            strategy = postflopService.getStrategy(innerPreflopActions, flopCardList, privateCardList, player, postflopActionList);
-        } catch (RuntimeException e) {
+            strategy = postflopService.getRiverStrategy(
+                    preflopActions,
+                    flopCardList,
+                    innerTurnCard,
+                    innerRiverCard,
+                    privateCardList,
+                    player,
+                    postflopActionList,
+                    riverActionList,
+                    pot,
+                    effectiveStack);
+        } catch (Throwable e) {
             model.addAttribute("errMsg", e.getMessage());
             return "error";
         }
@@ -236,7 +200,7 @@ public class PostflopController {
         String suggestedAction = null;
         for (String action : strategy.keySet()) {
             String key = String.format("%s: %.2f", action, strategy.get(action));
-            String value = StringUtils.isEmpty(postflopActions) ? action : postflopActions + ":" + action;
+            String value = StringUtils.isEmpty(riverActions) ? action : riverActions + ":" + action;
             cur += strategy.get(action) * 10000;
             if (cur > r && suggestedAction == null) {
                 suggestedAction = action;
@@ -248,6 +212,8 @@ public class PostflopController {
         if (strategy.isEmpty()) {
             model.addAttribute("nextStreet", true);
         }
+        model.addAttribute("pot", pot);
+        model.addAttribute("effectiveStack", effectiveStack);
         model.addAttribute("riverCard", riverCard);
         model.addAttribute("strategy", outStrategy);
         return "river";
@@ -268,7 +234,7 @@ public class PostflopController {
         return cardList;
     }
 
-    private List<Card> convertPrivateCards(String cards) {
+    private List<Card> convertPrivateCards(String cards, Map<String, String> convertRules) {
         cards = cards.replace('♠', 's');
         cards = cards.replace('♥', 'h');
         cards = cards.replace('♣', 'c');
@@ -278,24 +244,48 @@ public class PostflopController {
         for (int i = 0; i < cards.length(); i+=2) {
             cardList.add(new Card(cards.substring(i, i+2)));
         }
-        Collections.sort(cardList);
-        Collections.reverse(cardList);
+        convertCardListByRules(cardList, convertRules, true);
 
         return cardList;
     }
 
-    private Card convertCard(List<Card> flopCards, String card) {
+    private Card convertCard(String card, Map<String, String> convertRules) {
         card =  card.replace('♠', 's')
                 .replace('♥', 'h')
                 .replace('♣', 'c')
                 .replace('♦', 'd');
 
+        return convertCardByRules(new Card(card), convertRules);
+    }
+
+    private Map<String, String> getConvertRules(List<Card> flopCards) {
         String flopCardSuits = "";
         for (Card c : flopCards) {
             flopCardSuits += c.getSuit();
         }
         boolean formerTwoIsEqual = flopCards.get(0).getRank().equals(flopCards.get(1).getRank());
-        Map<String, String> convertRules = FlopCardConvertUtil.getConvertRule(flopCardSuits, formerTwoIsEqual);
-        return postflopService.convertCard(new Card(card), convertRules);
+        return FlopCardConvertUtil.getConvertRule(flopCardSuits, formerTwoIsEqual);
+    }
+
+    private List<Card> convertCardListByRules(List<Card> srcList, Map<String, String> convertRules, boolean reverse) {
+        List<Card> dstList = new ArrayList<>();
+        for (Card src : srcList) {
+            dstList.add(convertCardByRules(src, convertRules));
+        }
+        Collections.sort(dstList);
+        if (reverse) {
+            Collections.reverse(dstList);
+        }
+        return dstList;
+    }
+
+    public Card convertCardByRules(Card src, Map<String, String> convertRules) {
+        if (!convertRules.containsKey(src.getSuit())) {
+            return new Card(src.getCard());
+        }
+
+
+        String dstCard = src.getCard().replace(src.getSuit(), convertRules.get(src.getSuit()));
+        return new Card(dstCard);
     }
 }

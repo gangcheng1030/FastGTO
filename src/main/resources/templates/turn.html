@@ -94,7 +94,7 @@
     </div>
 
     <div th:if="${nextStreet}">
-        <a th:href="@{/postflop/river(preflopActions=${preflopActions}, flopCards=${flopCards}, privateCards=${privateCards}, position=${position}, postflopActions=${postflopActions})}" style="font-size: 20px;">进入River</a>
+        <a th:href="@{/postflop/river(preflopActions=${preflopActions}, flopCards=${flopCards}, privateCards=${privateCards}, position=${position}, postflopActions=${postflopActions}, turnCard=${turnCard})}" style="font-size: 20px;">进入River</a>
     </div>
 </div>
 </body>

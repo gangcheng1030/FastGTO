@@ -8,14 +8,13 @@ public class Postflop {
     private static final long serialVersionUID = 7230052310725727465L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     @Column(name = "preflop_actions", columnDefinition = "varchar(256)")
     private String preflopActions;
     @Column(name = "flop_cards", columnDefinition = "char(6)")
     private String flopCards;
     @Column(name = "parent")
-    private Integer parent;
+    private Long parent;
     @Column(name = "player", columnDefinition = "tinyint")
     private Integer player;
     @Column(name = "node_type", columnDefinition = "tinyint")
@@ -25,11 +24,11 @@ public class Postflop {
     @Column(name = "strategy", columnDefinition = "varchar(4096)")
     private String strategy;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -49,20 +48,12 @@ public class Postflop {
         this.flopCards = flopCards;
     }
 
-    public Integer getParent() {
+    public Long getParent() {
         return parent;
     }
 
-    public void setParent(Integer parent) {
+    public void setParent(Long parent) {
         this.parent = parent;
-    }
-
-    public String getStrategy() {
-        return strategy;
-    }
-
-    public void setStrategy(String strategy) {
-        this.strategy = strategy;
     }
 
     public Integer getPlayer() {
@@ -87,5 +78,27 @@ public class Postflop {
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public String getStrategy() {
+        return strategy;
+    }
+
+    public void setStrategy(String strategy) {
+        this.strategy = strategy;
+    }
+
+    @Override
+    public String toString() {
+        return "Postflop{" +
+                "id=" + id +
+                ", preflopActions='" + preflopActions + '\'' +
+                ", flopCards='" + flopCards + '\'' +
+                ", parent=" + parent +
+                ", player=" + player +
+                ", nodeType=" + nodeType +
+                ", action='" + action + '\'' +
+                ", strategy='" + strategy + '\'' +
+                '}';
     }
 }

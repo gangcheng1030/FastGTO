@@ -32,11 +32,28 @@
     <input type="text" id="riverCard" name="riverCard" placeholder="点击上方按钮">
   </div>
 
+  <div class="card-container" id="potContainer">
+    <!-- 通过JavaScript动态生成 -->
+  </div>
+  <div class="container">
+    <label for="pot">底池大小：</label>
+    <input type="text" id="pot" name="pot" placeholder="点击上方按钮">
+  </div>
+
+  <div class="card-container" id="effectiveStackContainer">
+    <!-- 通过JavaScript动态生成 -->
+  </div>
+  <div class="container">
+    <label for="effectiveStack">有效筹码：</label>
+    <input type="text" id="effectiveStack" name="effectiveStack" placeholder="点击上方按钮">
+  </div>
+
   <div id="preflopActions" th:text="${preflopActions}" style="display: none"></div>
   <div id="flopCards" th:text="${flopCards}" style="display: none"></div>
   <div id="privateCards" th:text="${privateCards}" style="display: none"></div>
   <div id="position" th:text="${position}" style="display: none"></div>
   <div id="postflopActions" th:text="${postflopActions}" style="display: none"></div>
+  <div id="turnCard" th:text="${turnCard}" style="display: none"></div>
   <a id="getStrategy" href="#">获取策略</a>
 
   <script>
@@ -63,8 +80,42 @@
       }
     }
 
+    // 生成数字按钮
+    const stacks = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const potInput = document.getElementById('pot');
+    function generatePot() {
+      const potContainer = document.getElementById('potContainer');
+      potContainer.innerHTML = ''; // 清空容器
+      for (let stack of stacks) {
+        const button = document.createElement('button');
+        button.textContent = `${stack}`;
+        button.className = 'card-button';
+        button.onclick = function () {
+          potInput.value = potInput.value + `${stack}`;
+        };
+        potContainer.appendChild(button);
+      }
+    }
+
+    const effectiveStackInput = document.getElementById('effectiveStack');
+    function generateEffectiveStack() {
+      const effectiveStackContainer = document.getElementById('effectiveStackContainer');
+      effectiveStackContainer.innerHTML = ''; // 清空容器
+      for (let stack of stacks) {
+        const button = document.createElement('button');
+        button.textContent = `${stack}`;
+        button.className = 'card-button';
+        button.onclick = function () {
+          effectiveStackInput.value = effectiveStackInput.value + `${stack}`;
+        };
+        effectiveStackContainer.appendChild(button);
+      }
+    }
+
     // 初始化扑克牌
     generateRiverCards();
+    generatePot();
+    generateEffectiveStack();
 
     // 设置链接的href属性，使其包含输入框的值作为GET请求的参数
     const getStrategyLink = document.getElementById('getStrategy');
@@ -73,6 +124,7 @@
     const privateCards = document.getElementById("privateCards");
     const position = document.getElementById("position");
     const postflopActions = document.getElementById("postflopActions");
+    const turnCard = document.getElementById('turnCard');
     getStrategyLink.href = `#`;
     getStrategyLink.onclick = function() {
       if (!riverCardInput.value.trim()) {
@@ -80,7 +132,7 @@
         return false;
       }
 
-      getStrategyLink.href = `/postflop/river?preflopActions=${preflopActions.textContent}&flopCards=${flopCards.textContent}&privateCards=${privateCards.textContent}&position=${position.textContent}&postflopActions=${postflopActions.textContent}&riverCard=${riverCardInput.value}`;
+      getStrategyLink.href = `/postflop/river?preflopActions=${preflopActions.textContent}&flopCards=${flopCards.textContent}&privateCards=${privateCards.textContent}&position=${position.textContent}&postflopActions=${postflopActions.textContent}&turnCard=${turnCard.textContent}&riverCard=${riverCardInput.value}&pot=${potInput.value}&effectiveStack=${effectiveStackInput.value}`;
       return true;
     };
   </script>
@@ -88,7 +140,7 @@
 <div th:unless="${needInput}">
   <div class="container">
     <div th:each="entry : ${strategy}">
-      <a th:href="@{/postflop/river(preflopActions=${preflopActions}, flopCards=${flopCards}, privateCards=${privateCards}, position=${position}, postflopActions=${entry.getValue()}, riverCard=${riverCard}, notChance=true)}"
+      <a th:href="@{/postflop/river(preflopActions=${preflopActions}, flopCards=${flopCards}, privateCards=${privateCards}, position=${position}, postflopActions=${postflopActions}, turnCard=${turnCard}, riverCard=${riverCard}, pot=${pot}, effectiveStack=${effectiveStack}, riverActions=${entry.getValue()})}"
          th:text="${entry.getKey()}" style="font-size: 20px;"></a>
     </div>
   </div>

@@ -5,7 +5,6 @@ import gangcheng1030.texasholdem.fastgto.core.PostflopTreeNode;
 import gangcheng1030.texasholdem.fastgto.service.PostflopService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,10 +15,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+    private static final ExecutorService fixedThreadPool = Executors.newFixedThreadPool(1);
     private static final Map<String, String> preflopConvertMap = new HashMap<>();
     static {
         preflopConvertMap.put("BN_VS_LJ_SRP", "LJ2bet:HJfold:COfold:BNcall:SBfold:BBfold");
@@ -66,27 +68,34 @@ public class AdminController {
     @PostMapping("/postflop_strategy")
     public String importPostflopStrategy(@RequestParam(name = "dirName") String dirName,
                                          @RequestParam(name = "prefix", required = false) String prefix) throws IOException {
-        long startTime = System.currentTimeMillis();
+
         final String prefixF = prefix == null ? "" : prefix;
         Path path = Paths.get(dirName);
         Files.list(path).forEach(subPath -> {
-            try {
-                if (Files.isRegularFile(subPath) && subPath.getFileName().toString().startsWith(prefixF)) {
-                    String fileName = subPath.getFileName().toString();
-                    int lastIndex = fileName.lastIndexOf("_");
-                    String preflopActions = fileName.substring(0, lastIndex);
-                    preflopActions = preflopConvertMap.getOrDefault(preflopActions, preflopActions);
-                    String flopCards = fileName.substring(lastIndex + 1, lastIndex + 7);
-                    String content = new String(Files.readAllBytes(subPath));
-                    PostflopTreeNode postflopTreeNode = JSON.parseObject(content, PostflopTreeNode.class);
-                    postflopService.importPostflopTree(postflopTreeNode, preflopActions, flopCards);
+            fixedThreadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (Files.isRegularFile(subPath) && subPath.getFileName().toString().startsWith(prefixF)) {
+                            long startTime = System.currentTimeMillis();
+                            String fileName = subPath.getFileName().toString();
+                            System.out.printf("%s 开始处理 \n", fileName);
+                            int lastIndex = fileName.lastIndexOf("_");
+                            String preflopActions = fileName.substring(0, lastIndex);
+                            preflopActions = preflopConvertMap.getOrDefault(preflopActions, preflopActions);
+                            String flopCards = fileName.substring(lastIndex + 1, lastIndex + 7);
+                            String content = new String(Files.readAllBytes(subPath));
+                            PostflopTreeNode postflopTreeNode = JSON.parseObject(content, PostflopTreeNode.class);
+                            postflopService.importPostflopTree(postflopTreeNode, preflopActions, flopCards);
+                            long endTime = System.currentTimeMillis();
+                            System.out.printf("%s 耗时：%d秒 \n", fileName, (endTime - startTime) / 1000);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            });
         });
-        long endTime = System.currentTimeMillis();
-        System.out.printf("耗时：%d秒 \n", (endTime - startTime) / 1000);
         return "ok";
     }
 }

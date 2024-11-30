@@ -17,7 +17,7 @@ public class Strategy {
             String key = entry.getKey();
             List<Integer> cweights = new ArrayList<>();
             for (Double weight : entry.getValue()) {
-                cweights.add((int)(weight * 1000));
+                cweights.add((int)(weight * Constants.WEIGHTS_RADIX));
             }
             cstrategy.put(key, cweights);
         }

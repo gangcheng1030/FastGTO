@@ -13,4 +13,6 @@ public class Constants {
     public static final String ACTION_RAISE = "raise";
     public static final String ACTION_CALL = "call";
     public static final String ACTION_FOLD = "fold";
+
+    public static final int WEIGHTS_RADIX = 1000;
 }
