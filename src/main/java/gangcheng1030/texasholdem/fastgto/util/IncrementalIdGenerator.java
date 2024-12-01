@@ -9,7 +9,7 @@ public class IncrementalIdGenerator {
     // 根据当前时间戳和计数器生成ID
     public static long nextId() {
         long timestamp = timeGen();
-        return timestamp << 17 | SEQUENCE.get();
+        return timestamp << 17 | SEQUENCE.getAndIncrement();
     }
 
     // 高位部分的时间戳生成

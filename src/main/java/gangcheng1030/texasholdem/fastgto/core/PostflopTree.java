@@ -25,8 +25,8 @@ public class PostflopTree {
 
         PostflopTreeNode cur = this.root;
         for (String action : actions) {
-            if (cur == null) {
-                throw new ActionNotFoundException(action);
+            if (cur.getChildrens() == null && cur.getDealcards() == null) {
+                return null;
             }
             if (cur.getNode_type().equals(ACTION_NODE)) {
                 cur = cur.getChildrens().get(action);

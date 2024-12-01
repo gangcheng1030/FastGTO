@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta th:if="${postflopActions}" http-equiv="refresh" th:attr="content='0;url=/postflop/turn?preflopActions=' + ${preflopActions} + '&flopCards=' + ${flopCards} + '&privateCards=' + ${privateCards} + '&position=' + ${position} + '&postflopActions=' + ${postflopActions}">
     <title>Flop</title>
     <style>
         .card-container {
@@ -143,10 +144,6 @@
             <a th:href="@{/postflop/flop(preflopActions=${preflopActions}, flopCards=${flopCards}, privateCards=${privateCards}, position=${position}, postflopActions=${entry.getValue()})}"
                th:text="${entry.getKey()}" style="font-size: 20px;"></a>
         </div>
-    </div>
-
-    <div th:if="${postflopActions}">
-        <a th:href="@{/postflop/turn(preflopActions=${preflopActions}, flopCards=${flopCards}, privateCards=${privateCards}, position=${position}, postflopActions=${postflopActions})}" style="font-size: 20px;">进入Turn</a>
     </div>
 </div>
 </body>

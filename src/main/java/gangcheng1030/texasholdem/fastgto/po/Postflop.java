@@ -21,7 +21,7 @@ public class Postflop {
     private Integer nodeType;
     @Column(name = "action", columnDefinition = "varchar(32)")
     private String action;
-    @Column(name = "strategy", columnDefinition = "varchar(4096)")
+    @Column(name = "strategy", columnDefinition = "varchar(16384)")
     private String strategy;
 
     public Long getId() {
