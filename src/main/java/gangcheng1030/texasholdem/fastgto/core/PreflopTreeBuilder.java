@@ -3,13 +3,12 @@ package gangcheng1030.texasholdem.fastgto.core;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class PreflopTreeBuilder {
-    public static PreflopTreeNode buildPreflopTree(String directoryPath) throws IOException {
-        PreflopTreeNode rootNode = buildPreflopTreeRecursive(directoryPath, true);
+    public static PreflopTreeNode buildPreflopTree(Path path) throws IOException {
+        PreflopTreeNode rootNode = buildPreflopTreeRecursive(path, true);
         rootNode = rewritePreflopTree(rootNode);
         rootNode = rewritePreflopTree2(rootNode);
         return rootNode;
@@ -90,8 +89,7 @@ public class PreflopTreeBuilder {
 
         return root;
     }
-    private static PreflopTreeNode buildPreflopTreeRecursive(String directoryPath, boolean isRoot) throws IOException {
-        Path path = Paths.get(directoryPath);
+    private static PreflopTreeNode buildPreflopTreeRecursive(Path path, boolean isRoot) throws IOException {
         PreflopTreeNode rootNode = new PreflopTreeNode();
         if (!isRoot) {
             String name = path.getName(path.getNameCount() - 1).toString();
@@ -103,7 +101,7 @@ public class PreflopTreeBuilder {
         if (Files.isDirectory(path)) {
             Files.list(path).forEach(subPath -> {
                 try {
-                    PreflopTreeNode node =  buildPreflopTreeRecursive(subPath.toString(), false);
+                    PreflopTreeNode node =  buildPreflopTreeRecursive(subPath, false);
                     rootNode.addChild(node.getName(), node);
                 } catch (IOException e) {
                     e.printStackTrace();

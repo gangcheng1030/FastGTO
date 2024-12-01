@@ -1,22 +1,28 @@
 package gangcheng1030.texasholdem.fastgto.core;
 
+import gangcheng1030.texasholdem.fastgto.config.PreflopConfig;
 import gangcheng1030.texasholdem.fastgto.exceptions.RangesIllegalException;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Component
 public class PreflopTree {
+
     private PreflopTreeNode root = null;
 
-    public PreflopTree() {
+    @Autowired
+    private PreflopConfig preflopConfig;
+
+    @PostConstruct
+    public void init() {
         try {
-            ClassLoader classLoader = getClass().getClassLoader();
-            String path = "PioRanges_nlhe_100bb_2.5x_NL200";
-            root = PreflopTreeBuilder.buildPreflopTree(classLoader.getResource(path).getFile());
-        } catch (IOException e) {
+            root = PreflopTreeBuilder.buildPreflopTree(Paths.get(preflopConfig.getPath()));
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -1,7 +1,6 @@
 package gangcheng1030.texasholdem.fastgto.service;
 
 import com.alibaba.fastjson.JSON;
-import com.github.f4b6a3.uuid.UuidCreator;
 import gangcheng1030.texasholdem.fastgto.core.*;
 import gangcheng1030.texasholdem.fastgto.dao.PostflopRepository;
 import gangcheng1030.texasholdem.fastgto.core.NodeType;
@@ -10,6 +9,7 @@ import gangcheng1030.texasholdem.fastgto.exceptions.StrategyNotFoundException;
 import gangcheng1030.texasholdem.fastgto.po.Postflop;
 import gangcheng1030.texasholdem.fastgto.riversolver.ranges.PrivateCards;
 import gangcheng1030.texasholdem.fastgto.riversolver.utils.PrivateRangeConverter;
+import gangcheng1030.texasholdem.fastgto.util.IncrementalIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -24,6 +24,8 @@ public class PostflopService {
     private RiverSolverManager riverSolverManager;
     @Autowired
     private PreflopTree preflopTree;
+    @Autowired
+    private JDBCRepository jdbcRepository;
 
     // 这里的flopCards，turnCard，riverCard，privateCards必须是标准化后的
     public TreeMap<String, Double> getRiverStrategy(String preflopActions,
@@ -172,7 +174,7 @@ public class PostflopService {
 
     public void importPostflopTree(PostflopTreeNode root, String preflopActions, String flopCards) {
         Postflop postflop = new Postflop();
-        postflop.setId(UuidCreator.getTimeBased().getMostSignificantBits());
+        postflop.setId(IncrementalIdGenerator.nextId());
         postflop.setPreflopActions(preflopActions);
         postflop.setFlopCards(flopCards);
         postflop.setParent(0L);
@@ -181,22 +183,26 @@ public class PostflopService {
         CompressedStrategy compressedStrategy = root.getStrategy().compress();
         postflop.setStrategy(JSON.toJSONString(compressedStrategy));
 
+        List<Postflop> postflopList = new ArrayList<>();
+        postflopList.add(postflop);
         try {
-            Postflop savedPostflop = postflopRepository.save(postflop);
             Map<String, PostflopTreeNode> children = root.getChildrens();
             for (String action : children.keySet()) {
-                importPostflopTreeInner(children.get(action), savedPostflop.getId(), flopCards, action);
+                importPostflopTreeInner(children.get(action), postflop.getId(), flopCards, action, postflopList);
             }
         } catch (Throwable e) {
             System.out.println(postflop);
             e.printStackTrace();
             throw e;
         }
+        if (postflopList.size() > 0) {
+            jdbcRepository.addAllPostflops(postflopList);
+        }
     }
 
-    private void importPostflopTreeInner(PostflopTreeNode root, Long parent, String flopCards, String action) {
+    private void importPostflopTreeInner(PostflopTreeNode root, Long parent, String flopCards, String action, List<Postflop> postflopList) {
         Postflop postflop = new Postflop();
-        postflop.setId(UuidCreator.getTimeBased().getMostSignificantBits());
+        postflop.setId(IncrementalIdGenerator.nextId());
         postflop.setFlopCards(flopCards);
         postflop.setParent(parent);
         postflop.setPlayer(root.getPlayer());
@@ -207,10 +213,7 @@ public class PostflopService {
             postflop.setStrategy(JSON.toJSONString(compressedStrategy));
         }
 
-        long startTime = System.currentTimeMillis();
-        Postflop savedPostflop = postflopRepository.save(postflop);
-        long endTime = System.currentTimeMillis();
-        System.out.printf("插入一条数据耗时：%d", endTime - startTime);
+        postflopList.add(postflop);
         Map<String, PostflopTreeNode> children = null;
         if (root.getNode_type().equals(NodeType.ACTION_NODE.getType())) {
             children = root.getChildrens();
@@ -220,11 +223,15 @@ public class PostflopService {
 
         if (children != null) {
             for (String childAction : children.keySet()) {
-                importPostflopTreeInner(children.get(childAction), savedPostflop.getId(), flopCards, childAction);
+                importPostflopTreeInner(children.get(childAction), postflop.getId(), flopCards, childAction, postflopList);
             }
         }
-    }
 
+        if (postflopList.size() >= 10) {
+            jdbcRepository.addAllPostflops(postflopList);
+            postflopList.clear();
+        }
+    }
     private String convertCardsToString(List<Card> cards) {
         StringBuilder sb = new StringBuilder();
         for (Card card : cards) {

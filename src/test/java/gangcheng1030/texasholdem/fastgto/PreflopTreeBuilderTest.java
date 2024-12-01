@@ -5,6 +5,7 @@ import gangcheng1030.texasholdem.fastgto.core.PreflopTreeNode;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 
 public class PreflopTreeBuilderTest {
     @Test
@@ -12,9 +13,9 @@ public class PreflopTreeBuilderTest {
         try {
             ClassLoader classLoader = getClass().getClassLoader();
             String path = "PioRanges_nlhe_100bb_2.5x_NL200";
-            PreflopTreeNode root = PreflopTreeBuilder.buildPreflopTree(classLoader.getResource(path).getFile());
+            PreflopTreeNode root = PreflopTreeBuilder.buildPreflopTree(Paths.get(classLoader.getResource(path).toURI()));
             printPreflopTree(root);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

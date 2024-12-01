@@ -27,8 +27,7 @@ public class RiverSolverManager {
         String[] ranks = new String[]{"A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"};
         try {
             String fileName = "compairer/card5_dic_sorted.txt";
-            String fullFileName = getClass().getClassLoader().getResource(fileName).getFile();
-            compairer = new Dic5Compairer(fullFileName, 2598961);
+            compairer = new Dic5Compairer(fileName, 2598961);
             deck = new Deck(Arrays.asList(ranks), Arrays.asList(suits));
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,7 +87,7 @@ public class RiverSolverManager {
                 riverCard.getCardInt()
         };
 
-        String logfile_name = "src/main/resources/outputs/outputs_log.txt";
+        String logfile_name = "/tmp/outputs_log.txt";
         Solver solver = new ParallelCfrPlusSolver(gameTree
                 , range1
                 , range2

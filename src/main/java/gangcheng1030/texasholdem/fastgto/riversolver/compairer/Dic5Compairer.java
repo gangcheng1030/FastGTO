@@ -8,9 +8,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.paukov.combinatorics3.Generator;
 import org.paukov.combinatorics3.IGenerator;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -38,7 +36,9 @@ public class Dic5Compairer extends Compairer {
         //cards2rank = (Map<Set<String>,Integer>)new Hashtable<Set<String>,Integer>(lines * 50);
         cardslong2rank = (Map<Long,Integer>)new Hashtable<Long,Integer>(lines * 50);
 
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(dic_dir));
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(dic_dir);
+        assert inputStream != null;
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         String str;
         ProgressBar pb = new ProgressBar("Dic5Comapirer Load",lines);
         if (verbose) pb.start();
