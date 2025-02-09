@@ -83,6 +83,7 @@ public class AdminController {
                             int lastIndex = fileName.lastIndexOf("_");
                             String preflopActions = fileName.substring(0, lastIndex);
                             preflopActions = preflopConvertMap.getOrDefault(preflopActions, preflopActions);
+                            preflopActions = preflopActions.replaceAll("_", ":");
                             String flopCards = fileName.substring(lastIndex + 1, lastIndex + 7);
                             String content = new String(Files.readAllBytes(subPath));
                             PostflopTreeNode postflopTreeNode = JSON.parseObject(content, PostflopTreeNode.class);

@@ -244,7 +244,7 @@ public class PostflopController {
         for (int i = 0; i < cards.length(); i+=2) {
             cardList.add(new Card(cards.substring(i, i+2)));
         }
-        convertCardListByRules(cardList, convertRules, true);
+        cardList = convertCardListByRules(cardList, convertRules, true);
 
         return cardList;
     }

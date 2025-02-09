@@ -58,7 +58,7 @@ public class PreflopTreeBuilder {
         return root;
     }
 
-    // 补充 BBfolds
+    // 补充 BBfolds, BNfolds
     private static PreflopTreeNode rewritePreflopTree2(PreflopTreeNode root) {
         if (root == null) {
             return null;
@@ -69,10 +69,13 @@ public class PreflopTreeBuilder {
         }
 
         boolean isBBNode = false;
+        boolean isBNNode = false;
         boolean containFoldsNode = false;
         for (Map.Entry<String, PreflopTreeNode> entry : root.getChildren().entrySet()) {
             if (entry.getValue().getPosition().equals(Constants.POSITION_BB)) {
                 isBBNode = true;
+            } else if (entry.getValue().getPosition().equals(Constants.POSITION_BN)) {
+                isBNNode = true;
             }
             if (entry.getKey().contains("fold")) {
                 containFoldsNode = true;
@@ -81,6 +84,10 @@ public class PreflopTreeBuilder {
         if (isBBNode && !containFoldsNode) {
             PreflopTreeNode node = new PreflopTreeNode("BBfold", "fold", "BB");
             root.getChildren().put("BBfold", node);
+        }
+        if (isBNNode && !containFoldsNode) {
+            PreflopTreeNode node = new PreflopTreeNode("BNfold", "fold", "BN");
+            root.getChildren().put("BNfold", node);
         }
 
         for (PreflopTreeNode node : root.getChildren().values()) {
